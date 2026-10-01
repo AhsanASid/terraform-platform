@@ -28,3 +28,13 @@ module "vpc" {
   azs                 = ["ap-south-1a", "ap-south-1b"]
   public_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
 }
+
+data "aws_ssm_parameter" "demo" {
+  name            = "/platform/dev/demo-secret"
+  with_decryption = true
+}
+
+output "demo_secret" {
+  value     = data.aws_ssm_parameter.demo.value
+  sensitive = true
+}
