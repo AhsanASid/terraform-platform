@@ -24,3 +24,9 @@ provider "aws" {
 output "hello" {
   value = "remote state works"
 }
+
+module "vpc" {
+  source     = "./modules/vpc"
+  name       = "platform-dev"
+  cidr_block = "10.0.0.0/16"
+}
