@@ -22,7 +22,7 @@ provider "aws" {
 }
 
 module "vpc" {
-  source              = "./modules/vpc"
+  source              = "../../modules/vpc"
   name                = "platform-dev"
   cidr_block          = "10.0.0.0/16"
   azs                 = ["ap-south-1a", "ap-south-1b"]
