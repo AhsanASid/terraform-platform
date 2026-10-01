@@ -21,10 +21,6 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-output "hello" {
-  value = "remote state works"
-}
-
 module "vpc" {
   source              = "./modules/vpc"
   name                = "platform-dev"
