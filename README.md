@@ -4,7 +4,7 @@ An end-to-end cloud platform on AWS, built phase by phase with Terraform.
 
 ## Status
 - [x] Phase 1: Modular IaC and secrets management
-- [ ] Phase 2: EKS and container CI (GitHub Actions)
+- [x] Phase 2: Container CI (GitHub Actions) and Kubernetes delivery on a local kind cluster (EKS Terraform planned as plan-only)
 - [ ] Phase 3: GitOps (ArgoCD) and observability (Prometheus, Grafana, Loki)
 - [ ] Phase 4: Canary deployments (Argo Rollouts)
 - [ ] Phase 5: Backups/DR (Velero) and cost optimization
@@ -32,3 +32,8 @@ Requires AWS credentials configured locally and your own state bucket name in th
 
 ## Cleanup
 `terraform destroy` from `envs/dev`. The state bucket is created manually and removed separately.
+
+## Phase 2 summary (local-first)
+- **CI:** [hello-api](https://github.com/AhsanASid/hello-api) builds a non-root container image with GitHub Actions and publishes it to GHCR, tagged by commit SHA
+- **Delivery:** [platform-manifests](https://github.com/AhsanASid/platform-manifests) holds the Kubernetes desired state (probes, resource limits, rolling updates)
+- **Cluster:** local `kind` cluster instead of EKS. The AWS account has no credits, and EKS costs about $0.10/hr for the control plane alone, so the Kubernetes work runs locally at zero cost
