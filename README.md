@@ -1,6 +1,11 @@
-# AWS Platform Engineering Project
+# CloudOps Platform -- Infrastructure as Code (AWS & Terraform)
 
-An end-to-end cloud platform on AWS, built phase by phase with Terraform.
+Modular Infrastructure as Code on AWS built with Terraform, adhering to production security best practices and strict cost-optimization guardrails.
+
+Part of the **CloudOps Platform** project:
+- **[terraform-platform](https://github.com/AhsanASid/terraform-platform)**: Modular AWS Infrastructure as Code (VPC, IAM, SSM, plan-only EKS)
+- **[platform-manifests](https://github.com/AhsanASid/platform-manifests)**: Kubernetes desired state, Argo Rollouts, Observability, and Velero DR
+- **[hello-api](https://github.com/AhsanASid/hello-api)**: Python microservice & automated GitHub Actions CI pipeline
 
 ## Status
 - [x] Phase 1: Modular IaC and secrets management
