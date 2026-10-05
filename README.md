@@ -4,10 +4,10 @@ An end-to-end cloud platform on AWS, built phase by phase with Terraform.
 
 ## Status
 - [x] Phase 1: Modular IaC and secrets management
-- [x] Phase 2: Container CI (GitHub Actions) and Kubernetes delivery on a local kind cluster (EKS Terraform planned as plan-only)
-- [ ] Phase 3: GitOps (ArgoCD) and observability (Prometheus, Grafana, Loki)
-- [ ] Phase 4: Canary deployments (Argo Rollouts)
-- [ ] Phase 5: Backups/DR (Velero) and cost optimization
+- [x] Phase 2: Container CI (GitHub Actions) and Kubernetes delivery on a local kind cluster
+- [x] Phase 3: Observability (Prometheus, Grafana, Loki) & GitOps repo layout
+- [x] Phase 4: Canary progressive delivery (Argo Rollouts)
+- [x] Phase 5: Backups/DR (Velero) and cost optimization (plan-only EKS)
 
 ## Phase 1 highlights
 - **Remote state:** S3 bucket (versioned, encrypted, public access blocked) with native S3 state locking
@@ -16,24 +16,22 @@ An end-to-end cloud platform on AWS, built phase by phase with Terraform.
 - **Least privilege:** read-only IAM role assumed via temporary credentials
 - **Layout:** `modules/` for shared code, `envs/<name>/` for each environment
 
-## Design decisions
-- Public subnets only for now. NAT gateways (~$32/month each) are deferred to protect a credit-limited budget
-- Parameter Store over Secrets Manager: free tier, adequate without automatic rotation
-- Provider pinned (`~> 6.0`) and lock file committed for reproducible builds
+## Design decisions & Cost Optimization
+- **Zero-Spend Constraint:** Strict adherence to free-tier/zero-cost engineering. AWS EKS control planes incur ~$0.10/hour plus compute costs.
+- **EKS Architecture (Plan-Only):** The `modules/eks` module defines the complete production AWS EKS architecture (control plane, IAM roles, managed node groups with autoscaling). It is verified via `terraform plan` to prove enterprise AWS platform proficiency, but never `terraform apply`'d to eliminate AWS charges.
+- **Local-First Kubernetes:** Workloads, observability (Prometheus, Grafana, Loki), progressive delivery (Argo Rollouts), and disaster recovery (Velero + MinIO) run locally on a single-node `kind` cluster.
+- **Public subnets only:** NAT gateways (~$32/month each) are omitted to protect the zero-spend budget.
+- **Parameter Store over Secrets Manager:** Free tier, adequate without automatic rotation.
+- **Provider pinned:** (`~> 6.0`) and lock file committed for reproducible builds.
 
 ## Usage
 ```bash
 cd envs/dev
 terraform init
 terraform plan
-terraform apply
+# Note: DO NOT run terraform apply for EKS in credit-limited dev environments
 ```
 Requires AWS credentials configured locally and your own state bucket name in the backend block.
 
 ## Cleanup
-`terraform destroy` from `envs/dev`. The state bucket is created manually and removed separately.
-
-## Phase 2 summary (local-first)
-- **CI:** [hello-api](https://github.com/AhsanASid/hello-api) builds a non-root container image with GitHub Actions and publishes it to GHCR, tagged by commit SHA
-- **Delivery:** [platform-manifests](https://github.com/AhsanASid/platform-manifests) holds the Kubernetes desired state (probes, resource limits, rolling updates)
-- **Cluster:** local `kind` cluster instead of EKS. The AWS account has no credits, and EKS costs about $0.10/hr for the control plane alone, so the Kubernetes work runs locally at zero cost
+`terraform destroy` from `envs/dev` if any resources are applied. The state bucket is created manually and removed separately.
